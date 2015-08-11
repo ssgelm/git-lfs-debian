@@ -11,7 +11,6 @@ export PATH := $(CURDIR)/$(BUILD_DIR)/bin:$(PATH)
 	dh $@ --buildsystem=golang --with=golang
 
 override_dh_clean:
-	rm -f debian/debhelper.log
 	rm -rf man
 	dh_clean
 
