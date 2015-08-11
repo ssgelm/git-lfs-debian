@@ -20,14 +20,38 @@ assert_pointer() {
   fi
 }
 
-# no-op.  check that the object does not exist in the git lfs server
+# check that the object does not exist in the git lfs server. HTTP log is
+# written to http.log. JSON output is written to http.json.
+#
+#   $ refute_server_object "reponame" "oid"
 refute_server_object() {
-  echo "refute server object: no-op"
+  local reponame="$1"
+  local oid="$2"
+  curl -v "$GITSERVER/$reponame.git/info/lfs/objects/$oid" \
+    -u "user:pass" \
+    -o http.json \
+    -H "Accept: application/vnd.git-lfs+json" 2>&1 |
+    tee http.log
+
+  grep "404 Not Found" http.log
 }
 
-# no-op.  check that the object does exist in the git lfs server
+# check that the object does exist in the git lfs server. HTTP log is written
+# to http.log. JSON output is written to http.json.
 assert_server_object() {
-  echo "assert server object: no-op"
+  local reponame="$1"
+  local oid="$2"
+  curl -v "$GITSERVER/$reponame.git/info/lfs/objects/$oid" \
+    -u "user:pass" \
+    -o http.json \
+    -H "Accept: application/vnd.git-lfs+json" 2>&1 |
+    tee http.log
+  grep "200 OK" http.log
+
+  grep "download" http.json || {
+    cat http.json
+    exit 1
+  }
 }
 
 # pointer returns a string Git LFS pointer file.
@@ -102,15 +126,16 @@ setup() {
   rm -rf "$REMOTEDIR"
   mkdir "$REMOTEDIR"
 
-  if [ -z "$SKIPCOMPILE" ]; then
+  if [ -z "$SKIPCOMPILE" ] && [ -z "$LFS_BIN" ]; then
     echo "compile git-lfs for $0"
     script/bootstrap || {
       return $?
     }
   fi
 
-  echo "Git LFS: $(which git-lfs)"
+  echo "Git LFS: ${LFS_BIN:-$(which git-lfs)}"
   git lfs version
+  git version
 
   if [ -z "$SKIPCOMPILE" ]; then
     for go in test/cmd/*.go; do
@@ -121,15 +146,20 @@ setup() {
   echo "tmp dir: $TMPDIR"
   echo "remote git dir: $REMOTEDIR"
   echo "LFSTEST_URL=$LFS_URL_FILE LFSTEST_DIR=$REMOTEDIR lfstest-gitserver"
+  echo
   LFSTEST_URL="$LFS_URL_FILE" LFSTEST_DIR="$REMOTEDIR" lfstest-gitserver > "$REMOTEDIR/gitserver.log" 2>&1 &
 
   mkdir $HOME
-  git config -f "$HOME/.gitconfig" filter.lfs.required true
-  git config -f "$HOME/.gitconfig" filter.lfs.smudge "git lfs smudge %f"
-  git config -f "$HOME/.gitconfig" filter.lfs.clean "git lfs clean %f"
-  git config -f "$HOME/.gitconfig" credential.helper lfstest
-  git config -f "$HOME/.gitconfig" user.name "Git LFS Tests"
-  git config -f "$HOME/.gitconfig" user.email "git-lfs@example.com"
+  git lfs init
+  git config --global credential.helper lfstest
+  git config --global user.name "Git LFS Tests"
+  git config --global user.email "git-lfs@example.com"
+  grep "git-lfs clean" "$REMOTEDIR/home/.gitconfig" > /dev/null || {
+    echo "global git config should be set in $REMOTEDIR/home"
+    ls -al "$REMOTEDIR/home"
+    exit 1
+  }
+  cp "$HOME/.gitconfig" "$HOME/.gitconfig-backup"
 
   wait_for_file "$LFS_URL_FILE"
 }
@@ -142,9 +172,9 @@ shutdown() {
   if [ "$SHUTDOWN_LFS" != "no" ]; then
     # only cleanup test/remote after script/integration done OR a single
     # test/test-*.sh file is run manually.
-    [ -z "$KEEPTRASH" ] && rm -rf "$REMOTEDIR"
     if [ -s "$LFS_URL_FILE" ]; then
       curl "$(cat "$LFS_URL_FILE")/shutdown"
     fi
+    [ -z "$KEEPTRASH" ] && rm -rf "$REMOTEDIR"
   fi
 }

@@ -3,6 +3,7 @@ package commands
 import (
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	"github.com/github/git-lfs/git"
@@ -32,7 +33,7 @@ func fetchCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	pointers, err := lfs.ScanRefs(ref, "")
+	pointers, err := lfs.ScanRefs(ref, "", nil)
 	if err != nil {
 		Panic(err, "Could not scan for Git LFS files")
 	}
@@ -52,6 +53,9 @@ func fetchCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		Panic(err, "Could not fetch the current git ref")
 	}
+
+	var wait sync.WaitGroup
+	wait.Add(1)
 
 	if target == current {
 		// We just downloaded the files for the current ref, we can copy them into
@@ -100,12 +104,16 @@ func fetchCommand(cmd *cobra.Command, args []string) {
 			if err := cmd.Wait(); err != nil {
 				Panic(err, "Error updating the git index")
 			}
+			wait.Done()
 		}()
-
-		processQueue := time.Now()
-		q.Process()
-		tracerx.PerformanceSince("process queue", processQueue)
+	} else {
+		wait.Done()
 	}
+
+	processQueue := time.Now()
+	q.Process()
+	tracerx.PerformanceSince("process queue", processQueue)
+	wait.Wait()
 }
 
 func init() {
