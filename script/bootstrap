@@ -1,0 +1,5 @@
+#!/bin/sh
+
+script/fmt
+rm -rf `pwd`/bin/*
+go run script/*.go -cmd build "$@"

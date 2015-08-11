@@ -1,0 +1,62 @@
+git-lfs(1) -- Work with large files in Git repositories
+=======================================================
+
+## SYNOPSIS
+
+`git lfs` <command> [<args>]
+
+## DESCRIPTION
+
+Git LFS is a system for managing and versioning large files in
+association with a Git repository.  Instead of storing the large files
+within the Git repository as blobs, Git LFS stores special "pointer
+files" in the repository, while storing the actual file contents on a
+Git LFS server.  The contents of the large file are downloaded
+automatically when needed, for example when a Git branch containing
+the large file is checked out.
+
+Git LFS works by using a "smudge" filter to look up the large file
+contents based on the pointer file, and a "clean" filter to create a
+new version of the pointer file when the large file's contents change.
+It also uses a `pre-push` hook to upload the large file contents to
+the Git LFS server whenever a commit containing a new large file
+version is about to be pushed to the corresponding Git server.
+
+## COMMANDS
+
+Like Git, Git LFS commands are separated into high level ("porcelain")
+commands and low level ("plumbing") commands.
+
+### High-level commands (porcelain)
+
+* git-lfs-env(1):
+    Display the Git LFS environment.
+* git-lfs-fsck(1):
+    Check GIT LFS files for consistency.
+* git-lfs-init(1):
+    Ensure Git LFS is configured properly.
+* git-lfs-logs(1):
+    Show errors from the git-lfs command.
+* git-lfs-ls-files(1):
+    Show information about Git LFS files in the index and working tree.
+* git-lfs-push(1):
+    Push queued large files to the Git LFS endpoint.
+* git-lfs-status(1):
+    Show the status of Git LFS files in the working tree.
+* git-lfs-track(1):
+    View or add Git LFS paths to Git attributes.
+* git-lfs-untrack(1):
+    Remove Git LFS paths from Git Attributes.
+* git-lfs-update(1):
+    Update Git hooks for the current Git repository.
+
+### Low level commands (plumbing)
+
+* git-lfs-clean(1):
+    Git clean filter that converts large files to pointers.
+* git-lfs-pointer(1):
+    Build and compare pointers.
+* git-lfs-pre-push(1):
+    Git pre-push hook implementation.
+* git-lfs-smudge(1):
+    Git smudge filter that converts pointer in blobs to the actual content.

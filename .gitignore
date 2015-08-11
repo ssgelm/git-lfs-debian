@@ -1,0 +1,18 @@
+bin/
+benchmark/
+
+# only allow man/*.\d.ronn files
+man/*
+
+*.test
+tmp
+test/remote
+
+debian/git-lfs/
+debian/*.log
+debian/files
+debian/*.substvars
+obj-*
+
+rpm/BUILD*
+rpm/*RPMS

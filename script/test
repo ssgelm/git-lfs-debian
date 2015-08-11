@@ -1,0 +1,10 @@
+#!/bin/sh
+#/ Usage: script/test          # run all tests
+#/        script/test <subdir> # run just a package's tests
+
+script/fmt
+suite="./${1:-"lfs"}"
+if [ $# -gt 0 ]; then
+  shift
+fi
+go test $suite "$@"
