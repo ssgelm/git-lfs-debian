@@ -1,9 +1,16 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: git-lfs
+Upstream-Contact: support@github.com
 Source: https://github.com/github/git-lfs
 
 Files: *
 Copyright: 2013-2015 Github, Inc.
+License: Expat
+
+Files: debian/*
+Copyright: 2015 Stephen Gelman
+License: Expat
+
 License: Expat
  Copyright (c) GitHub, Inc. and Git LFS contributors
  .
