@@ -9,6 +9,8 @@ Build-Depends: debhelper (>= 9),
                ruby-ronn
 Standards-Version: 3.9.6
 Homepage: https://git-lfs.github.com/
+Vcs-Browser: https://github.com/ssgelm/git-lfs-debian
+Vcs-Git: git://github.com/ssgelm/git-lfs-debian.git
 
 Package: git-lfs
 Architecture: any
