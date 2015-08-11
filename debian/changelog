@@ -4,7 +4,8 @@ git-lfs (0.5.4-1) unstable; urgency=low
   * Change urgency to low
   * Add watch file
   * Imported Upstream version 0.5.4
-  * dh_clean automatically removes debhelper.log so it does not need to be specified in the override
+  * dh_clean automatically removes debhelper.log so it does not need to be
+    specified in the override
   * Add git repo to debian/control
   * Update copyright file
   * Add lintian-override for hardening-no-fortify-functions
