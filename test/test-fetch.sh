@@ -1,28 +1,18 @@
 #!/bin/sh
-# This is a sample Git LFS test.  See test/README.md and testhelpers.sh for
-# more documentation.
 
 . "test/testlib.sh"
 
-begin_test "batch transfer"
+begin_test "fetch"
 (
   set -e
 
-  # This initializes a new bare git repository in test/remote.
-  # These remote repositories are global to every test, so keep the names
-  # unique.
   reponame="$(basename "$0" ".sh")"
   setup_remote_repo "$reponame"
 
-  # Clone the repository from the test Git server.  This is empty, and will be
-  # used to test a "git pull" below. The repo is cloned to $TRASHDIR/clone
   clone_repo "$reponame" clone
 
-  # Clone the repository again to $TRASHDIR/repo. This will be used to commit
-  # and push objects.
   clone_repo "$reponame" repo
 
-  # This executes Git LFS from the local repo that was just cloned.
   git lfs track "*.dat" 2>&1 | tee track.log
   grep "Tracking \*.dat" track.log
 
@@ -40,20 +30,27 @@ begin_test "batch transfer"
 
   [ "a" = "$(cat a.dat)" ]
 
-  # This is a small shell function that runs several git commands together.
   assert_pointer "master" "a.dat" "$contents_oid" 1
 
   refute_server_object "$reponame" "$contents_oid"
 
-  # Ensure batch transfer is turned on for this repo
-  git config --add --local lfs.batch true
-
-  # This pushes to the remote repository set up at the top of the test.
   git push origin master 2>&1 | tee push.log
   grep "(1 of 1 files)" push.log
   grep "master -> master" push.log
 
   assert_server_object "$reponame" "$contents_oid"
+
+  # Add a file in a different branch
+  git checkout -b newbranch
+  b="b"
+  b_oid=$(printf "$b" | shasum -a 256 | cut -f 1 -d " ")
+  printf "$b" > b.dat
+  git add b.dat
+  git commit -m "add b.dat"
+  assert_pointer "newbranch" "b.dat" "$b_oid" 1
+
+  git push origin newbranch
+  assert_server_object "$reponame" "$b_oid"
 
   # change to the clone's working directory
   cd ../clone
@@ -63,5 +60,20 @@ begin_test "batch transfer"
   [ "a" = "$(cat a.dat)" ]
 
   assert_pointer "master" "a.dat" "$contents_oid" 1
+
+
+  # Remove the working directory and lfs files
+  rm a.dat
+  rm -rf .git/lfs/objects
+
+  git lfs fetch 2>&1 | grep "(1 of 1 files)"
+
+  [ "a" = "$(cat a.dat)" ]
+
+  git checkout newbranch
+  git checkout master
+  rm -rf .git/lfs/objects
+
+  git lfs fetch newbranch 2>&1 | grep "(2 of 2 files)"
 )
 end_test
