@@ -1,3 +1,17 @@
+git-lfs (0.5.4-1) unstable; urgency=low
+
+  * Run `wrap-and-sort -a`
+  * Change urgency to low
+  * Add watch file
+  * Imported Upstream version 0.5.4
+  * dh_clean automatically removes debhelper.log so it does not need to be specified in the override
+  * Add git repo to debian/control
+  * Update copyright file
+  * Add lintian-override for hardening-no-fortify-functions
+  * Add longer description
+
+ -- Stephen Gelman <ssgelm@gmail.com>  Tue, 11 Aug 2015 05:14:29 +0000
+
 git-lfs (0.5.2-1) unstable; urgency=low
 
   * Initial release. (Closes: #792075)
