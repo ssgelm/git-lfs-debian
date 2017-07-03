@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 . "test/testlib.sh"
 reponame="submodule-test-repo"
@@ -26,6 +26,7 @@ begin_test "submodule local git dir"
   git push origin master
 
   grep "sub module" sub/dir/README || {
+    echo "submodule not setup correctly?"
     cat sub/dir/README
     exit 1
   }
@@ -40,40 +41,45 @@ begin_test "submodule env"
   cd repo
 
   git lfs env | tee env.log
-  grep "Endpoint=$GITSERVER/$reponame.git/info/lfs$" env.log
-  grep "LocalWorkingDir=$TRASHDIR/repo$" env.log
-  grep "LocalGitDir=$TRASHDIR/repo/.git$" env.log
-  grep "LocalMediaDir=$TRASHDIR/repo/.git/lfs/objects$" env.log
-  grep "TempDir=$TRASHDIR/repo/.git/lfs/tmp$" env.log
+  grep "Endpoint=$GITSERVER/$reponame.git/info/lfs (auth=none)$" env.log
+  grep "LocalWorkingDir=$(native_path_escaped "$TRASHDIR/repo$")" env.log
+  grep "LocalGitDir=$(native_path_escaped "$TRASHDIR/repo/.git$")" env.log
+  grep "LocalGitStorageDir=$(native_path_escaped "$TRASHDIR/repo/.git$")" env.log
+  grep "LocalMediaDir=$(native_path_escaped "$TRASHDIR/repo/.git/lfs/objects$")" env.log
+  grep "TempDir=$(native_path_escaped "$TRASHDIR/repo/.git/lfs/tmp$")" env.log
 
   cd .git
 
   echo "./.git"
   git lfs env | tee env.log
-  grep "Endpoint=$GITSERVER/$reponame.git/info/lfs$" env.log
+  cat env.log
+  grep "Endpoint=$GITSERVER/$reponame.git/info/lfs (auth=none)$" env.log
   grep "LocalWorkingDir=$" env.log
-  grep "LocalGitDir=$TRASHDIR/repo/.git$" env.log
-  grep "LocalMediaDir=$TRASHDIR/repo/.git/lfs/objects$" env.log
-  grep "TempDir=$TRASHDIR/repo/.git/lfs/tmp$" env.log
+  grep "LocalGitDir=$(native_path_escaped "$TRASHDIR/repo/.git$")" env.log
+  grep "LocalGitStorageDir=$(native_path_escaped "$TRASHDIR/repo/.git$")" env.log
+  grep "LocalMediaDir=$(native_path_escaped "$TRASHDIR/repo/.git/lfs/objects$")" env.log
+  grep "TempDir=$(native_path_escaped "$TRASHDIR/repo/.git/lfs/tmp$")" env.log
 
   cd ../sub
 
   echo "./sub"
   git lfs env | tee env.log
-  grep "Endpoint=$GITSERVER/$submodname.git/info/lfs$" env.log
-  grep "LocalWorkingDir=$TRASHDIR/repo/sub$" env.log
-  grep "LocalGitDir=$TRASHDIR/repo/.git/modules/sub$" env.log
-  grep "LocalMediaDir=$TRASHDIR/repo/.git/modules/sub/lfs/objects$" env.log
-  grep "TempDir=$TRASHDIR/repo/.git/modules/sub/lfs/tmp$" env.log
+  grep "Endpoint=$GITSERVER/$submodname.git/info/lfs (auth=none)$" env.log
+  grep "LocalWorkingDir=$(native_path_escaped "$TRASHDIR/repo/sub$")" env.log
+  grep "LocalGitDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub$")" env.log
+  grep "LocalGitStorageDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub$")" env.log
+  grep "LocalMediaDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub/lfs/objects$")" env.log
+  grep "TempDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub/lfs/tmp$")" env.log
 
   cd dir
 
   echo "./sub/dir"
   git lfs env | tee env.log
-  grep "Endpoint=$GITSERVER/$submodname.git/info/lfs$" env.log
-  grep "LocalWorkingDir=$TRASHDIR/repo/sub$" env.log
-  grep "LocalGitDir=$TRASHDIR/repo/.git/modules/sub$" env.log
-  grep "LocalMediaDir=$TRASHDIR/repo/.git/modules/sub/lfs/objects$" env.log
-  grep "TempDir=$TRASHDIR/repo/.git/modules/sub/lfs/tmp$" env.log
+  grep "Endpoint=$GITSERVER/$submodname.git/info/lfs (auth=none)$" env.log
+  grep "LocalWorkingDir=$(native_path_escaped "$TRASHDIR/repo/sub$")" env.log
+  grep "LocalGitDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub$")" env.log
+  grep "LocalGitStorageDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub$")" env.log
+  grep "LocalMediaDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub/lfs/objects$")" env.log
+  grep "TempDir=$(native_path_escaped "$TRASHDIR/repo/.git/modules/sub/lfs/tmp$")" env.log
 )
 end_test

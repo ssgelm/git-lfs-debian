@@ -17,7 +17,8 @@ only a pointer file is written.
 * Lines of key/value pairs MUST be sorted alphabetically in ascending order
 (with the exception of `version`, which is always first).
 * Values MUST NOT contain return or newline characters.
-* Pointer files SHOULD NOT have the executable bit set when checked out from Git.
+* Pointer files MUST be stored in Git with their executable bit matching that
+of the replaced file.
 
 The required keys are:
 
@@ -114,48 +115,13 @@ a pointer built by another tool.
     Pointers do not match
     ```
 
-## The Server
-
-Git LFS needs a URL endpoint to talk to a remote server.  A Git repository
-can have different Git LFS endpoints for different remotes.  Here is the list
-of rules that Git LFS uses to determine a repository's Git LFS server:
-
-1. The `lfs.url` string.
-2. The `remote.{name}.lfsurl` string.
-3. Append `/info/lfs` to the remote URL.  Only works with HTTPS URLs.
-
-Git LFS runs two `git config` commands to build up the list of values that it
-uses:
-
-1. `git config -l -f .gitconfig` - This file is checked into the repository and
-can set defaults for every user that clones the repository.
-2. `git config -l` - A user's local git configuration can override any settings
-from `.gitconfig`.
-
-Here's a sample Git config file with the optional remote and Git LFS
-configuration options:
-
-```
-[core]
-  repositoryformatversion = 0
-[lfs]
-  url = "https://github.com/github/git-lfs.git/info/lfs"
-[remote "origin"]
-  url = https://github.com/github/git-lfs
-  fetch = +refs/heads/*:refs/remotes/origin/*
-  lfsurl = "https://github.com/github/git-lfs.git/info/lfs"
-```
-
-Git LFS uses `git credential` to fetch credentials for HTTPS requests.  Setup
-a credential cache helper to save passwords for future users.
-
 ## Intercepting Git
 
 Git LFS uses the `clean` and `smudge` filters to decide which files use it.  The
-global filters can be set up with `git lfs init`:
+global filters can be set up with `git lfs install`:
 
 ```
-$ git lfs init
+$ git lfs install
 ```
 
 These filters ensure that large files aren't written into the repository proper,
@@ -200,5 +166,3 @@ $ cat .gitattributes
 ```
 
 Use the `git lfs track` command to view and add to `.gitattributes`.
-
-

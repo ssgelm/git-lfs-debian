@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # This is a sample Git LFS test.  See test/README.md and testhelpers.sh for
 # more documentation.
 
@@ -24,10 +24,10 @@ begin_test "happy path"
 
   # This executes Git LFS from the local repo that was just cloned.
   git lfs track "*.dat" 2>&1 | tee track.log
-  grep "Tracking \*.dat" track.log
+  grep "Tracking \"\*.dat\"" track.log
 
   contents="a"
-  contents_oid=$(printf "$contents" | shasum -a 256 | cut -f 1 -d " ")
+  contents_oid=$(calc_oid "$contents")
 
   # Regular Git commands can be used.
   printf "$contents" > a.dat
@@ -61,5 +61,38 @@ begin_test "happy path"
   [ "a" = "$(cat a.dat)" ]
 
   assert_pointer "master" "a.dat" "$contents_oid" 1
+)
+end_test
+
+begin_test "clears local temp objects"
+(
+  set -e
+
+  mkdir repo-temp-objects
+  cd repo-temp-objects
+  git init
+
+  # abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01
+  mkdir -p .git/lfs/objects/go/od
+  mkdir -p .git/lfs/tmp/objects
+
+  touch .git/lfs/objects/go/od/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx
+  touch .git/lfs/tmp/objects/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx-rand123
+  touch .git/lfs/tmp/objects/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx-rand456
+  touch .git/lfs/tmp/objects/badabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxy-rand123
+  touch .git/lfs/tmp/objects/badabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxy-rand456
+
+  GIT_TRACE=5 git lfs env
+
+  # object file exists
+  [ -e ".git/lfs/objects/go/od/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx" ]
+
+  # newer tmp files exist
+  [ -e ".git/lfs/tmp/objects/badabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxy-rand123" ]
+  [ -e ".git/lfs/tmp/objects/badabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxy-rand456" ]
+
+  # existing tmp files were cleaned up
+  [ ! -e ".git/lfs/tmp/objects/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx-rand123" ]
+  [ ! -e ".git/lfs/tmp/objects/goodabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwx-rand456" ]
 )
 end_test

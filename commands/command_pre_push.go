@@ -1,22 +1,18 @@
 package commands
 
 import (
-	"io/ioutil"
+	"bufio"
 	"os"
 	"strings"
 
-	"github.com/github/git-lfs/lfs"
-	"github.com/github/git-lfs/vendor/_nuts/github.com/spf13/cobra"
+	"github.com/git-lfs/git-lfs/git"
+	"github.com/rubyist/tracerx"
+	"github.com/spf13/cobra"
 )
 
 var (
-	prePushCmd = &cobra.Command{
-		Use:   "pre-push",
-		Short: "Implements the Git pre-push hook",
-		Run:   prePushCommand,
-	}
 	prePushDryRun       = false
-	prePushDeleteBranch = "(delete)"
+	prePushDeleteBranch = strings.Repeat("0", 40)
 )
 
 // prePushCommand is run through Git's pre-push hook. The pre-push hook passes
@@ -42,72 +38,50 @@ var (
 // In the case of deleting a branch, no attempts to push Git LFS objects will be
 // made.
 func prePushCommand(cmd *cobra.Command, args []string) {
-	var left, right string
-
 	if len(args) == 0 {
 		Print("This should be run through Git's pre-push hook.  Run `git lfs update` to install it.")
 		os.Exit(1)
 	}
 
-	lfs.Config.CurrentRemote = args[0]
+	requireGitVersion()
 
-	refsData, err := ioutil.ReadAll(os.Stdin)
+	// Remote is first arg
+	if err := git.ValidateRemote(args[0]); err != nil {
+		Exit("Invalid remote name %q", args[0])
+	}
+
+	ctx := newUploadContext(args[0], prePushDryRun)
+
+	gitscanner, err := ctx.buildGitScanner()
 	if err != nil {
-		Panic(err, "Error reading refs on stdin")
+		ExitWithError(err)
 	}
+	defer gitscanner.Close()
 
-	if len(refsData) == 0 {
-		return
-	}
+	// We can be passed multiple lines of refs
+	scanner := bufio.NewScanner(os.Stdin)
 
-	left, right = decodeRefs(string(refsData))
-	if left == prePushDeleteBranch {
-		return
-	}
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
 
-	// Just use scanner here
-	pointers, err := lfs.ScanRefs(left, right, nil)
-	if err != nil {
-		Panic(err, "Error scanning for Git LFS files")
-	}
-
-	uploadQueue := lfs.NewUploadQueue(lfs.Config.ConcurrentTransfers(), len(pointers))
-
-	for _, pointer := range pointers {
-		if prePushDryRun {
-			Print("push %s", pointer.Name)
+		if len(line) == 0 {
 			continue
 		}
 
-		u, wErr := lfs.NewUploadable(pointer.Oid, pointer.Name)
-		if wErr != nil {
-			if cleanPointerErr, ok := wErr.Err.(*lfs.CleanedPointerError); ok {
-				Exit("%s is an LFS pointer to %s, which does not exist in .git/lfs/objects.\n\nRun 'git lfs fsck' to verify Git LFS objects.",
-					pointer.Name, cleanPointerErr.Pointer.Oid)
-			} else if Debugging || wErr.Panic {
-				Panic(wErr.Err, wErr.Error())
-			} else {
-				Exit(wErr.Error())
-			}
+		tracerx.Printf("pre-push: %s", line)
+
+		left, _ := decodeRefs(line)
+		if left == prePushDeleteBranch {
+			continue
 		}
 
-		uploadQueue.Add(u)
-	}
-
-	if !prePushDryRun {
-		uploadQueue.Process()
-		for _, err := range uploadQueue.Errors() {
-			if Debugging || err.Panic {
-				LoggedError(err.Err, err.Error())
-			} else {
-				Error(err.Error())
-			}
-		}
-
-		if len(uploadQueue.Errors()) > 0 {
-			os.Exit(2)
+		if err := uploadLeftOrAll(gitscanner, ctx, left); err != nil {
+			Print("Error scanning for Git LFS files in %q", left)
+			ExitWithError(err)
 		}
 	}
+
+	ctx.Await()
 }
 
 // decodeRefs pulls the sha1s out of the line read from the pre-push
@@ -128,6 +102,7 @@ func decodeRefs(input string) (string, string) {
 }
 
 func init() {
-	prePushCmd.Flags().BoolVarP(&prePushDryRun, "dry-run", "d", false, "Do everything except actually send the updates")
-	RootCmd.AddCommand(prePushCmd)
+	RegisterCommand("pre-push", prePushCommand, func(cmd *cobra.Command) {
+		cmd.Flags().BoolVarP(&prePushDryRun, "dry-run", "d", false, "Do everything except actually send the updates")
+	})
 }

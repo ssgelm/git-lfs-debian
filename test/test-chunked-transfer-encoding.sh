@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # This is a sample Git LFS test.  See test/README.md and testhelpers.sh for
 # more documentation.
 
@@ -24,10 +24,10 @@ begin_test "chunked transfer encoding"
 
   # This executes Git LFS from the local repo that was just cloned.
   git lfs track "*.dat" 2>&1 | tee track.log
-  grep "Tracking \*.dat" track.log
+  grep "Tracking \"\*.dat\"" track.log
 
   contents="a"
-  contents_oid=$(printf "$contents" | shasum -a 256 | cut -f 1 -d " ")
+  contents_oid=$(calc_oid "$contents")
 
   # Regular Git commands can be used.
   printf "$contents" > a.dat

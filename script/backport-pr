@@ -1,16 +1,18 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Backports a PR into a release branch:
 #
 #   # backport PR #123 into release-0.5-backport-123
-#   $ script/backport-pr 0.5 123
+#   $ git checkout master
+#   $ git pull
+#   $ script/backport-pr 1.1 1023
 
 relversion="v$1.x"
 relbranch="release-$1"
 pr="$2"
 prbranch="$relbranch-backport-$pr"
-pullsurl="https://api.github.com/repos/github/git-lfs/pulls"
-prurl="https://api.github.com/repos/github/git-lfs/pulls/$pr"
+pullsurl="https://api.github.com/repos/git-lfs/git-lfs/pulls"
+prurl="https://api.github.com/repos/git-lfs/git-lfs/pulls/$pr"
 prjson="$(curl -n $pullsurl/$pr 2>/dev/null)"
 headref="$(echo $prjson | jq -r -e ".head.ref")"
 [ "$?" -ne 0 ] && {

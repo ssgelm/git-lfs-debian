@@ -1,2 +1,7 @@
-#!/bin/sh
-nut install
+#!/usr/bin/env bash
+glide update -s -u
+glide install -s -u
+
+rm -rf vendor/github.com/ThomsonReutersEikon/go-ntlm/utils
+rm -rf vendor/github.com/davecgh/go-spew
+rm -rf vendor/github.com/pmezard/go-difflib
