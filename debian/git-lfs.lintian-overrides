@@ -7,3 +7,7 @@ unstripped-binary-or-object usr/bin/git-lfs
 
 # The go compiler does not currently support fortified C functions
 hardening-no-fortify-functions usr/bin/git-lfs
+
+# PIE golang binaries are still not fully supported. See
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823014
+hardening-no-pie usr/bin/git-lfs

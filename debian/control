@@ -15,8 +15,8 @@ Build-Depends: debhelper (>= 9),
                golang-github-bgentry-go-netrc-dev,
                golang-github-olekukonko-ts-dev,
                golang-github-thomsonreuterseikon-go-ntlm-dev,
-               golang-github-xeipuuv-gojsonschema-dev (>= 0.0~git20170210.0.6b67b3f-1),
-Standards-Version: 3.9.6
+               golang-github-xeipuuv-gojsonschema-dev (>= 0.0~git20170210.0.6b67b3f),
+Standards-Version: 4.0.0
 Homepage: https://git-lfs.github.com/
 Vcs-Browser: https://github.com/ssgelm/git-lfs-debian
 Vcs-Git: git://github.com/ssgelm/git-lfs-debian.git
