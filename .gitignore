@@ -14,10 +14,7 @@ debian/git-lfs/
 debian/*.log
 debian/files
 debian/*.substvars
-debian/.debhelper
-debian/debhelper-build-stamp
 obj-*
-/.pc
 
 rpm/BUILD*
 rpm/*RPMS
