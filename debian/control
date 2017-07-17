@@ -19,7 +19,7 @@ Build-Depends: debhelper (>= 9),
 Standards-Version: 4.0.0
 Homepage: https://git-lfs.github.com/
 Vcs-Browser: https://github.com/ssgelm/git-lfs-debian
-Vcs-Git: git://github.com/ssgelm/git-lfs-debian.git
+Vcs-Git: https://github.com/ssgelm/git-lfs-debian.git
 
 Package: git-lfs
 Architecture: any
