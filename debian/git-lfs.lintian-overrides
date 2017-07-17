@@ -1,6 +1,3 @@
-# Go only produces static binaries so read-only relocations aren't possible
-hardening-no-relro usr/bin/git-lfs
-
 # strip disabled as golang upstream doesn't support it and it makes go
 # crash. See https://launchpad.net/bugs/1200255.
 unstripped-binary-or-object usr/bin/git-lfs
@@ -8,6 +5,10 @@ unstripped-binary-or-object usr/bin/git-lfs
 # The go compiler does not currently support fortified C functions
 hardening-no-fortify-functions usr/bin/git-lfs
 
-# PIE golang binaries are still not fully supported. See
+# PIE/bindnow golang binaries are still not fully supported. See
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823014
 hardening-no-pie usr/bin/git-lfs
+hardening-no-bindnow usr/bin/git-lfs
+
+# These are not actual spelling errors
+spelling-error-in-binary usr/bin/git-lfs
