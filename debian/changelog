@@ -1,5 +1,5 @@
-git-lfs (0.5.4-1) unstable; urgency=low
+git-lfs (2.2.0-1) unstable; urgency=low
 
   * Initial release. (Closes: #792075)
 
- -- Stephen Gelman <ssgelm@gmail.com>  Tue, 18 Aug 2015 19:06:03 +0000
+ -- Stephen Gelman <ssgelm@gmail.com>  Mon, 03 Jul 2017 04:03:41 +0000

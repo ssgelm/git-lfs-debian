@@ -1,0 +1,21 @@
+diff --git a/errors/types.go b/errors/types.go
+index efeca36c..d1f431fd 100644
+--- a/errors/types.go
++++ b/errors/types.go
+@@ -336,8 +336,14 @@ func NewRetriableError(err error) error {
+ }
+ 
+ func parentOf(err error) error {
+-	if c, ok := err.(errorWithCause); ok {
+-		return c.Cause()
++  type causer interface {
++    Cause() error
++  }
++
++	if c, ok := err.(causer); ok {
++    if innerC, innerOk := c.Cause().(causer); innerOk {
++      return innerC.Cause()
++    }
+ 	}
+ 
+ 	return nil

@@ -6,7 +6,16 @@ Build-Depends: debhelper (>= 9),
                dh-golang,
                git (>= 1.8.0),
                golang-go (>= 1.3.0),
-               ruby-ronn
+               ruby-ronn,
+               golang-github-kr-pty-dev,
+               golang-github-pkg-errors-dev,
+               golang-github-spf13-cobra-dev,
+               golang-github-cheggaaa-pb-dev,
+               golang-github-rubyist-tracerx-dev,
+               golang-github-bgentry-go-netrc-dev,
+               golang-github-olekukonko-ts-dev,
+               golang-github-thomsonreuterseikon-go-ntlm-dev,
+               golang-github-xeipuuv-gojsonschema-dev (>= 0.0~git20170210.0.6b67b3f-1),
 Standards-Version: 3.9.6
 Homepage: https://git-lfs.github.com/
 Vcs-Browser: https://github.com/ssgelm/git-lfs-debian

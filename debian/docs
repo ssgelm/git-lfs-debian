@@ -1,4 +1,4 @@
 README.md
 ROADMAP.md
-docs/api/
-docs/spec.md
+docs/api/*.md
+docs/*.md
