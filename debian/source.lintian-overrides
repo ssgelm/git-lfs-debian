@@ -1,0 +1,3 @@
+# The tests of this package include some windows binaries. These are necessary
+# for the package's tests to pass
+git-lfs source: source-contains-prebuilt-windows-binary
