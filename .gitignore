@@ -29,3 +29,7 @@ commands/mancontent_gen.go
 
 lfstest-*
 !lfstest-*.go
+
+/.pc
+debian/.debhelper
+debian/debhelper-build-stamp
