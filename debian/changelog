@@ -1,4 +1,4 @@
-git-lfs (2.2.1-1) unstable; urgency=low
+git-lfs (2.2.1-1) unstable; urgency=medium
 
   * Initial release. (Closes: #792075)
 
