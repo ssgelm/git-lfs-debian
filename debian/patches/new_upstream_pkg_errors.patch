@@ -3,6 +3,8 @@ Description: Update code to work with newer version of github.com/pkg/errors
 Forwarded: https://github.com/git-lfs/git-lfs/issues/2390
 Author: Stephen Gelman <ssgelm@gmail.com>
 Last-Update: 2017-07-16
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/errors/types.go
 +++ b/errors/types.go
 @@ -336,8 +336,14 @@

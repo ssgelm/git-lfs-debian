@@ -22,7 +22,3 @@ override_dh_auto_build:
 	rm $(BUILD_DIR)/bin/man
 	rm $(BUILD_DIR)/bin/genmakefile
 	./script/man
-
-override_dh_strip:
-	# strip disabled as golang upstream doesn't support it and it makes go
-	# crash. See https://launchpad.net/bugs/1200255.
