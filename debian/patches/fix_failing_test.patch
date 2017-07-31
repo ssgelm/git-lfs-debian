@@ -1,0 +1,37 @@
+Description: The tests fail when run outside of a git repo. This has been fixed
+ upstream and will be in the next release.
+Origin: https://github.com/git-lfs/git-lfs/issues/2457
+Last-Update: 2017-07-31
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+diff --git a/git/object_scanner.go b/git/object_scanner.go
+index 88e6ec261..ae51bc9ba 100644
+--- a/git/object_scanner.go
++++ b/git/object_scanner.go
+@@ -132,6 +132,10 @@ func (s *ObjectScanner) Scan(oid string) bool {
+ // called upon. If there were any errors in freeing that (those) resource(s), it
+ // it will be returned, otherwise nil.
+ func (s *ObjectScanner) Close() error {
++	if s == nil {
++		return nil
++	}
++
+ 	if s.closeFn != nil {
+ 		return s.closeFn()
+ 	}
+diff --git a/git/odb/object_db_test.go b/git/odb/object_db_test.go
+index 0bbb0289e..228316059 100644
+--- a/git/odb/object_db_test.go
++++ b/git/odb/object_db_test.go
+@@ -203,6 +203,11 @@ func TestClosingAnObjectDatabaseMoreThanOnce(t *testing.T) {
+ 	db, err := FromFilesystem("/tmp")
+ 	assert.Nil(t, err)
+ 
++	// Make db's objectScanner field be nil, since /tmp doesn't contain a
++	// Git repository, which will cause closing `git-cat-file(1) --batch` to
++	// fail.
++	db.objectScanner = nil
++
+ 	assert.Nil(t, db.Close())
+ 	assert.EqualError(t, db.Close(), "git/odb: *ObjectDatabase already closed")
+ }
