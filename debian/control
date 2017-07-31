@@ -17,8 +17,8 @@ Build-Depends: debhelper (>= 9),
                golang-github-xeipuuv-gojsonschema-dev (>= 0.0~git20170210.0.6b67b3f),
 Standards-Version: 4.0.0
 Homepage: https://git-lfs.github.com/
-Vcs-Browser: https://github.com/ssgelm/git-lfs-debian
-Vcs-Git: https://github.com/ssgelm/git-lfs-debian.git
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-go/packages/git-lfs.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-go/packages/git-lfs.git
 
 Package: git-lfs
 Architecture: any
