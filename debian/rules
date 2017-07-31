@@ -22,5 +22,4 @@ override_dh_auto_build:
 	./script/man
 
 override_dh_auto_install:
-	mkdir -p debian/git-lfs/usr/bin
-	cp $(BUILD_DIR)/bin/git-lfs debian/git-lfs/usr/bin/
+	dh_auto_install -- --no-source
