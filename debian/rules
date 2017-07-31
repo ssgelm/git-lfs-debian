@@ -16,7 +16,6 @@ override_dh_clean:
 	dh_clean
 
 override_dh_auto_build:
-	rm -rf $(BUILD_DIR)/src/github.com/git-lfs/git-lfs/vendor
 	dh_auto_build
 	rm $(BUILD_DIR)/bin/script
 	rm $(BUILD_DIR)/bin/man
