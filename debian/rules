@@ -3,7 +3,6 @@
 export DH_OPTIONS
 
 BUILD_DIR := obj-$(DEB_BUILD_GNU_TYPE)
-export DH_GOPKG := github.com/git-lfs/git-lfs
 export DH_GOLANG_EXCLUDES := test vendor
 export DH_GOLANG_INSTALL_EXTRA := git/githistory/fixtures tq/schemas locking/schemas
 export PATH := $(CURDIR)/$(BUILD_DIR)/bin:$(PATH)
