@@ -1,7 +1,3 @@
-# strip disabled as golang upstream doesn't support it and it makes go
-# crash. See https://launchpad.net/bugs/1200255.
-unstripped-binary-or-object usr/bin/git-lfs
-
 # The go compiler does not currently support fortified C functions
 hardening-no-fortify-functions usr/bin/git-lfs
 
@@ -11,4 +7,4 @@ hardening-no-pie usr/bin/git-lfs
 hardening-no-bindnow usr/bin/git-lfs
 
 # These are not actual spelling errors
-spelling-error-in-binary usr/bin/git-lfs
+spelling-error-in-binary usr/bin/git-lfs ot to
